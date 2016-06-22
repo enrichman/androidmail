@@ -4,15 +4,23 @@ import android.os.AsyncTask;
 import android.util.Log;
 
 import javax.activation.DataHandler;
+import javax.activation.DataSource;
+import javax.activation.FileDataSource;
 import javax.mail.Message;
+import javax.mail.Multipart;
 import javax.mail.PasswordAuthentication;
 import javax.mail.Session;
 import javax.mail.Transport;
 import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
+import javax.mail.internet.MimeMultipart;
 
 import java.security.Security;
 
+import it.enricocandino.androidmail.model.Attachment;
+import it.enricocandino.androidmail.model.Mail;
+import it.enricocandino.androidmail.model.Recipient;
 import it.enricocandino.androidmail.provider.GmailProvider;
 import it.enricocandino.androidmail.provider.JSSEProvider;
 import it.enricocandino.androidmail.provider.MailProvider;
@@ -93,6 +101,19 @@ public class MailSender extends javax.mail.Authenticator {
                 DataHandler handler = new DataHandler(new ByteArrayDataSource(mail.getBody().getBytes(), "text/plain"));
                 message.setDataHandler(handler);
 
+                if(!mail.getAttachments().isEmpty()) {
+                    MimeBodyPart messageBodyPart = new MimeBodyPart();
+                    Multipart multipart = new MimeMultipart();
+
+                    for(Attachment attachment : mail.getAttachments()) {
+                        DataSource source = new FileDataSource(attachment.getPath());
+                        messageBodyPart.setDataHandler(new DataHandler(source));
+                        messageBodyPart.setFileName(attachment.getFilename());
+                        multipart.addBodyPart(messageBodyPart);
+                    }
+                    message.setContent(multipart);
+                }
+
                 Transport.send(message);
 
             } catch (Exception e) {
@@ -114,5 +135,4 @@ public class MailSender extends javax.mail.Authenticator {
             }
         }
     }
-
 }

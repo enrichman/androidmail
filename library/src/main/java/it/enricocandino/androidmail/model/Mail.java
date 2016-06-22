@@ -1,4 +1,4 @@
-package it.enricocandino.androidmail;
+package it.enricocandino.androidmail.model;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,6 +14,7 @@ public class Mail {
     private List<Recipient> recipients;
     private String subject;
     private String body;
+    private List<Attachment> attachments;
 
     public String getSender() {
         return sender;
@@ -47,31 +48,12 @@ public class Mail {
         this.body = body;
     }
 
-    public List<Recipient> getRecipientsByType(Recipient.TYPE type) {
-        List<Recipient> recipientsByType = new ArrayList<>();
-        if(this.recipients != null) {
-            for(Recipient r : recipients) {
-                if(r.getType() == type)
-                    recipientsByType.add(r);
-            }
-        }
-        return recipientsByType;
+    public List<Attachment> getAttachments() {
+        return attachments;
     }
 
-    public String getRecipientsAsString(Recipient.TYPE type) {
-        List<Recipient> recipients = getRecipientsByType(type);
-
-        String recipientsString = "";
-
-        if(!recipients.isEmpty()) {
-            StringBuilder sb = new StringBuilder(recipients.get(0).getAddress());
-            for(int i=1; i<this.recipients.size(); i++) {
-                sb.append(',').append(this.recipients.get(i));
-            }
-            recipientsString = sb.toString();
-        }
-
-        return recipientsString;
+    public void setAttachments(List<Attachment> attachments) {
+        this.attachments = attachments;
     }
 
     public static class MailBuilder {
@@ -80,6 +62,7 @@ public class Mail {
         private List<Recipient> recipients = new ArrayList<>();
         private String subject;
         private String body;
+        private List<Attachment> attachments = new ArrayList<>();
 
         public Mail build() {
             Mail mail = new Mail();
@@ -87,6 +70,7 @@ public class Mail {
             mail.recipients = this.recipients;
             mail.subject = this.subject;
             mail.body = this.body;
+            mail.attachments = this.attachments;
             return mail;
         }
 
@@ -107,6 +91,11 @@ public class Mail {
 
         public MailBuilder setBody(String body) {
             this.body = body;
+            return this;
+        }
+
+        public MailBuilder addAttachment(Attachment attachment) {
+            this.attachments.add(attachment);
             return this;
         }
     }

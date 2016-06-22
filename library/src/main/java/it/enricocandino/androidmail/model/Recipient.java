@@ -1,4 +1,4 @@
-package it.enricocandino.androidmail;
+package it.enricocandino.androidmail.model;
 
 /**
  * Copyright (c) 2016 Enrico Candino
