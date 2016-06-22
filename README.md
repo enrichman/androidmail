@@ -6,7 +6,21 @@ Android wrapper for JavaMail to easily send email without intents.
 Download
 --------
 
-// TODO
+The library is still in development but you can get the SNAPSHOT with Gradle:
+
+```groovy
+compile 'it.enricocandino:androidmail:1.0.0-SNAPSHOT'
+```
+
+or Maven:
+
+```xml
+<dependency>
+    <groupId>it.enricocandino</groupId>
+    <artifactId>androidmail</artifactId>
+    <version>1.0.0-SNAPSHOT</version>
+</dependency>
+```
 
 Examples
 --------
