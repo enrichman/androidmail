@@ -5,6 +5,7 @@ import android.os.Bundle;
 
 import it.enricocandino.androidmail.Mail;
 import it.enricocandino.androidmail.MailSender;
+import it.enricocandino.androidmail.Recipient;
 import it.enricocandino.sample.R;
 
 /**
@@ -24,13 +25,16 @@ public class MainActivity extends AppCompatActivity {
             public void run() {
 
                 try {
-                    MailSender mailSender = new MailSender("", "");
+                    MailSender mailSender = new MailSender("test@email.com", "");
 
                     Mail.MailBuilder builder = new Mail.MailBuilder();
                     Mail mail = builder
-                            .setBody("Hello")
-                            .setSender("")
-                            .addRecipient("")
+                            .setBody("Ciao")
+                            .setSender("test@email.com")
+                            .addRecipient(new Recipient("test@email.com"))
+                            .addRecipient(new Recipient(Recipient.TYPE.TO, "test@email.com"))
+                            .addRecipient(new Recipient(Recipient.TYPE.CC, "test@email.com"))
+                            .addRecipient(new Recipient(Recipient.TYPE.BCC, "test@email.com"))
                             .build();
 
                     mailSender.sendMail(mail);

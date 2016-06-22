@@ -11,7 +11,7 @@ import java.util.List;
 public class Mail {
 
     private String sender;
-    private List<String> recipients;
+    private List<Recipient> recipients;
     private String subject;
     private String body;
 
@@ -23,11 +23,11 @@ public class Mail {
         this.sender = sender;
     }
 
-    public List<String> getRecipients() {
+    public List<Recipient> getRecipients() {
         return recipients;
     }
 
-    public void setRecipients(List<String> recipients) {
+    public void setRecipients(List<Recipient> recipients) {
         this.recipients = recipients;
     }
 
@@ -47,10 +47,37 @@ public class Mail {
         this.body = body;
     }
 
+    public List<Recipient> getRecipientsByType(Recipient.TYPE type) {
+        List<Recipient> recipientsByType = new ArrayList<>();
+        if(this.recipients != null) {
+            for(Recipient r : recipients) {
+                if(r.getType() == type)
+                    recipientsByType.add(r);
+            }
+        }
+        return recipientsByType;
+    }
+
+    public String getRecipientsAsString(Recipient.TYPE type) {
+        List<Recipient> recipients = getRecipientsByType(type);
+
+        String recipientsString = "";
+
+        if(!recipients.isEmpty()) {
+            StringBuilder sb = new StringBuilder(recipients.get(0).getAddress());
+            for(int i=1; i<this.recipients.size(); i++) {
+                sb.append(',').append(this.recipients.get(i));
+            }
+            recipientsString = sb.toString();
+        }
+
+        return recipientsString;
+    }
+
     public static class MailBuilder {
 
         private String sender;
-        private List<String> recipients = new ArrayList<>();
+        private List<Recipient> recipients = new ArrayList<>();
         private String subject;
         private String body;
 
@@ -68,7 +95,7 @@ public class Mail {
             return this;
         }
 
-        public MailBuilder addRecipient(String recipient) {
+        public MailBuilder addRecipient(Recipient recipient) {
             this.recipients.add(recipient);
             return this;
         }

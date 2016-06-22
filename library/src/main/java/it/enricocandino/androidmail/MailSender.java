@@ -50,24 +50,28 @@ public class MailSender extends javax.mail.Authenticator {
             message.setSender(new InternetAddress(mail.getSender()));
             message.setSubject(mail.getSubject());
 
-            if(mail.getRecipients().size() == 1) {
-                message.setRecipient(Message.RecipientType.TO, new InternetAddress(mail.getRecipients().get(0)));
-
-            } else if(mail.getRecipients().size() > 1) {
-                StringBuilder sb = new StringBuilder(mail.getRecipients().get(0));
-                for(int i=1; i<mail.getRecipients().size(); i++) {
-                    sb.append(',').append(mail.getRecipients().get(i));
+            for(Recipient recipient : mail.getRecipients()) {
+                Message.RecipientType recipientType = null;
+                switch (recipient.getType()) {
+                    case TO:
+                        recipientType = Message.RecipientType.TO;
+                        break;
+                    case CC:
+                        recipientType = Message.RecipientType.CC;
+                        break;
+                    case BCC:
+                        recipientType = Message.RecipientType.BCC;
+                        break;
                 }
-                message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(sb.toString()));
+                message.addRecipient(recipientType, new InternetAddress(recipient.getAddress()));
+
             }
 
             DataHandler handler = new DataHandler(new ByteArrayDataSource(mail.getBody().getBytes(), "text/plain"));
             message.setDataHandler(handler);
 
             Transport.send(message);
-
-            System.out.println();
-
+            
         } catch (Exception e) {
             Log.e(getClass().getSimpleName(), "Error sending mail", e);
         }
