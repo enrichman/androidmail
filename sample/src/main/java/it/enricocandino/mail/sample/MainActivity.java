@@ -20,31 +20,19 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
+        MailSender mailSender = new MailSender("test@email.com", "");
 
-                try {
-                    MailSender mailSender = new MailSender("test@email.com", "");
+        Mail.MailBuilder builder = new Mail.MailBuilder();
+        Mail mail = builder
+                .setBody("Ciao")
+                .setSender("test@email.com")
+                .addRecipient(new Recipient("test@email.com"))
+                .addRecipient(new Recipient(Recipient.TYPE.TO, "test@email.com"))
+                .addRecipient(new Recipient(Recipient.TYPE.CC, "test@email.com"))
+                .addRecipient(new Recipient(Recipient.TYPE.BCC, "test@email.com"))
+                .build();
 
-                    Mail.MailBuilder builder = new Mail.MailBuilder();
-                    Mail mail = builder
-                            .setBody("Ciao")
-                            .setSender("test@email.com")
-                            .addRecipient(new Recipient("test@email.com"))
-                            .addRecipient(new Recipient(Recipient.TYPE.TO, "test@email.com"))
-                            .addRecipient(new Recipient(Recipient.TYPE.CC, "test@email.com"))
-                            .addRecipient(new Recipient(Recipient.TYPE.BCC, "test@email.com"))
-                            .build();
-
-                    mailSender.sendMail(mail);
-
-                } catch (Exception e) {
-                    System.out.println();
-                }
-
-            }
-        }).start();
+        mailSender.sendMail(mail);
 
         System.out.println();
     }

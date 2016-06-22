@@ -1,5 +1,6 @@
 package it.enricocandino.androidmail;
 
+import android.os.AsyncTask;
 import android.util.Log;
 
 import javax.activation.DataHandler;
@@ -23,6 +24,8 @@ import it.enricocandino.androidmail.provider.MailProvider;
  */
 public class MailSender extends javax.mail.Authenticator {
 
+    private OnMailSentListener listener;
+
     private String user;
     private String password;
     private Session session;
@@ -43,37 +46,72 @@ public class MailSender extends javax.mail.Authenticator {
         return new PasswordAuthentication(user, password);
     }
 
-    public void sendMail(Mail mail) throws Exception {
-        try {
-            MimeMessage message = new MimeMessage(session);
+    public void sendMail(Mail mail) {
+        sendMail(mail, null);
+    }
 
-            message.setSender(new InternetAddress(mail.getSender()));
-            message.setSubject(mail.getSubject());
+    public void sendMail(Mail mail, OnMailSentListener listener) {
+        this.listener = listener;
+        new MailTask().execute(mail);
+    }
 
-            for(Recipient recipient : mail.getRecipients()) {
-                Message.RecipientType recipientType = null;
-                switch (recipient.getType()) {
-                    case TO:
-                        recipientType = Message.RecipientType.TO;
-                        break;
-                    case CC:
-                        recipientType = Message.RecipientType.CC;
-                        break;
-                    case BCC:
-                        recipientType = Message.RecipientType.BCC;
-                        break;
+    public interface OnMailSentListener {
+        void onSuccess();
+        void onError(Exception error);
+    }
+
+    private class MailTask extends AsyncTask<Mail, Void, Void> {
+
+        private Exception error;
+
+        @Override
+        protected Void doInBackground(Mail... params) {
+            Mail mail = params[0];
+
+            try {
+                MimeMessage message = new MimeMessage(session);
+
+                message.setSender(new InternetAddress(mail.getSender()));
+                message.setSubject(mail.getSubject());
+
+                for(Recipient recipient : mail.getRecipients()) {
+                    Message.RecipientType recipientType = null;
+                    switch (recipient.getType()) {
+                        case TO:
+                            recipientType = Message.RecipientType.TO;
+                            break;
+                        case CC:
+                            recipientType = Message.RecipientType.CC;
+                            break;
+                        case BCC:
+                            recipientType = Message.RecipientType.BCC;
+                            break;
+                    }
+                    message.addRecipient(recipientType, new InternetAddress(recipient.getAddress()));
                 }
-                message.addRecipient(recipientType, new InternetAddress(recipient.getAddress()));
 
+                DataHandler handler = new DataHandler(new ByteArrayDataSource(mail.getBody().getBytes(), "text/plain"));
+                message.setDataHandler(handler);
+
+                Transport.send(message);
+
+            } catch (Exception e) {
+                Log.e(getClass().getSimpleName(), "Error sending mail", e);
+                error = e;
             }
 
-            DataHandler handler = new DataHandler(new ByteArrayDataSource(mail.getBody().getBytes(), "text/plain"));
-            message.setDataHandler(handler);
+            return null;
+        }
 
-            Transport.send(message);
-            
-        } catch (Exception e) {
-            Log.e(getClass().getSimpleName(), "Error sending mail", e);
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            if(listener != null) {
+                if(error != null) {
+                    listener.onError(error);
+                } else {
+                    listener.onSuccess();
+                }
+            }
         }
     }
 
