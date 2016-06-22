@@ -98,21 +98,35 @@ public class MailSender extends javax.mail.Authenticator {
                     message.addRecipient(recipientType, new InternetAddress(recipient.getAddress()));
                 }
 
-                DataHandler handler = new DataHandler(new ByteArrayDataSource(mail.getBody().getBytes(), "text/plain"));
-                message.setDataHandler(handler);
+                Multipart multipart = new MimeMultipart();
+
+                if(mail.getText() != null) {
+                    MimeBodyPart textBodyPart = new MimeBodyPart();
+                    ByteArrayDataSource textDatasource = new ByteArrayDataSource(mail.getText().getBytes(), "text/plain");
+                    DataHandler handler = new DataHandler(textDatasource);
+                    textBodyPart.setDataHandler(handler);
+                    multipart.addBodyPart(textBodyPart);
+                }
+
+                if(mail.getHtml() != null) {
+                    MimeBodyPart htmlBodyPart = new MimeBodyPart();
+                    ByteArrayDataSource htmlDatasource = new ByteArrayDataSource(mail.getHtml().getBytes(), "text/html");
+                    DataHandler handler = new DataHandler(htmlDatasource);
+                    htmlBodyPart.setDataHandler(handler);
+                    multipart.addBodyPart(htmlBodyPart);
+                }
 
                 if(!mail.getAttachments().isEmpty()) {
-                    MimeBodyPart messageBodyPart = new MimeBodyPart();
-                    Multipart multipart = new MimeMultipart();
-
                     for(Attachment attachment : mail.getAttachments()) {
+                        MimeBodyPart attachmentBodyPart = new MimeBodyPart();
                         DataSource source = new FileDataSource(attachment.getPath());
-                        messageBodyPart.setDataHandler(new DataHandler(source));
-                        messageBodyPart.setFileName(attachment.getFilename());
-                        multipart.addBodyPart(messageBodyPart);
+                        attachmentBodyPart.setDataHandler(new DataHandler(source));
+                        attachmentBodyPart.setFileName(attachment.getFilename());
+                        multipart.addBodyPart(attachmentBodyPart);
                     }
-                    message.setContent(multipart);
                 }
+
+                message.setContent(multipart);
 
                 Transport.send(message);
 

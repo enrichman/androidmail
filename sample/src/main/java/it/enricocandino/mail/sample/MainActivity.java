@@ -31,19 +31,30 @@ public class MainActivity extends AppCompatActivity {
         String filePath = Environment.getExternalStorageDirectory().getPath() +"/file.txt";
         String fileName = "file.txt";
 
-        MailSender mailSender = new MailSender("test@email.com", "");
+        String email = "test@email.com";
+        MailSender mailSender = new MailSender(email, "");
 
         Mail.MailBuilder builder = new Mail.MailBuilder();
         Mail mail = builder
-                .setSender("test@email.com")
-                .addRecipient(new Recipient("test@email.com"))
-                .setBody("Ciao")
+                .setSender(email)
+                .addRecipient(new Recipient(email))
+                .setText("Ciao")
+                .setHtml("<h1 style=\"color:red;\">Ciao</h1>")
                 .addAttachment(new Attachment(filePath, fileName))
                 .build();
 
-        mailSender.sendMail(mail);
+        mailSender.sendMail(mail, new MailSender.OnMailSentListener() {
 
-        System.out.println();
+            @Override
+            public void onSuccess() {
+                System.out.println();
+            }
+
+            @Override
+            public void onError(Exception error) {
+                System.out.println();
+            }
+        });
     }
 
     // Storage Permissions

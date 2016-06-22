@@ -13,7 +13,8 @@ public class Mail {
     private String sender;
     private List<Recipient> recipients;
     private String subject;
-    private String body;
+    private String text;
+    private String html;
     private List<Attachment> attachments;
 
     public String getSender() {
@@ -40,12 +41,20 @@ public class Mail {
         this.subject = subject;
     }
 
-    public String getBody() {
-        return body;
+    public String getText() {
+        return text;
     }
 
-    public void setBody(String body) {
-        this.body = body;
+    public void setText(String text) {
+        this.text = text;
+    }
+
+    public String getHtml() {
+        return html;
+    }
+
+    public void setHtml(String html) {
+        this.html = html;
     }
 
     public List<Attachment> getAttachments() {
@@ -61,7 +70,8 @@ public class Mail {
         private String sender;
         private List<Recipient> recipients = new ArrayList<>();
         private String subject;
-        private String body;
+        private String text;
+        private String html;
         private List<Attachment> attachments = new ArrayList<>();
 
         public Mail build() {
@@ -69,7 +79,8 @@ public class Mail {
             mail.sender = this.sender;
             mail.recipients = this.recipients;
             mail.subject = this.subject;
-            mail.body = this.body;
+            mail.text = this.text;
+            mail.html = this.html;
             mail.attachments = this.attachments;
             return mail;
         }
@@ -89,8 +100,13 @@ public class Mail {
             return this;
         }
 
-        public MailBuilder setBody(String body) {
-            this.body = body;
+        public MailBuilder setText(String text) {
+            this.text = text;
+            return this;
+        }
+
+        public MailBuilder setHtml(String html) {
+            this.html = html;
             return this;
         }
 
