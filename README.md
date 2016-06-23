@@ -26,7 +26,24 @@ Examples
 --------
 
 Create a MailSender with your email and password, build a Mail and send it.
-The mail will be sent in background and you will be notified through a listener.
+The mail will be sent in background with an AsyncTask.
+
+In the simplest way:
+
+```
+MailSender mailSender = new MailSender(email, password);
+
+Mail.MailBuilder builder = new Mail.MailBuilder();
+Mail mail = builder
+    .setSender(senderMail)
+    .addRecipient(new Recipient(recipient))
+    .setText("Hello")
+    .build();
+
+mailSender.sendMail(mail);
+```
+
+You can be notified through a listener, or add more recipients, html and attachments!
 
 ```
 MailSender mailSender = new MailSender(email, password);
